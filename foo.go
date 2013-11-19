@@ -8,9 +8,13 @@ import (
 )
 
 func main() {
-  height, width := 480, 640
-  image := image.NewRGBA(image.Rect(0, 0, width, height))
+  template, err := readTemplate()
+  if err != nil { panic(err) }
+  templateBounds := template.Bounds()
+  width  := templateBounds.Max.X * 4
+  height := templateBounds.Max.Y * 4
 
+  image := image.NewRGBA(image.Rect(0, 0, width, height))
   for x := 0; x <= width; x++ {
     for y := 0; y <= height; y++ {
       alphaValue := 255
@@ -21,7 +25,11 @@ func main() {
     }
   }
 
-  file, err := os.Create("foo.png")
+  writeCyper(image)
+}
+
+func writeCyper(image image.Image) {
+  file, err := os.Create("out/foo.png")
   if err != nil { panic(err) }
   defer func() {
     if err := file.Close(); err != nil {
@@ -34,9 +42,18 @@ func main() {
   if err = writer.Flush(); err != nil { panic(err) }
 }
 
-func readTemplate() (Image, Error) {
+func readTemplate() (image.Image, error) {
   file, err := os.Open("tux.png")
   if err != nil {
     return nil, err
   }
+
+  defer func() {
+    if err := file.Close(); err != nil {
+      panic(err)
+    }
+  }()
+
+  reader := bufio.NewReader(file)
+  return png.Decode(reader)
 }
