@@ -1,36 +1,44 @@
 package main
 import (
-  "fmt"
   "image"
   "image/png"
+  "image/color"
   "os"
+  "fmt"
   "bufio"
 )
+
+type CypherImage interface {
+  Set(int, int, color.Color)
+}
 
 func main() {
   template, err := readTemplate()
   if err != nil { panic(err) }
   templateBounds := template.Bounds()
-  width  := templateBounds.Max.X * 4
-  height := templateBounds.Max.Y * 4
+  sourceHeight   := templateBounds.Max.Y
+  sourceWidth    := templateBounds.Max.X
+  fmt.Printf("sourceWidth: %d\n", sourceWidth)
+  fmt.Printf("sourceHeight: %d\n", sourceHeight)
+  cypherHeight   := sourceHeight * 2
+  cypherWidth   := sourceWidth * 2
 
-  image := image.NewRGBA(image.Rect(0, 0, width, height))
-  /* for x := 0; x <= width; x++ {*/
-  /*   for y := 0; y <= height; y++ {*/
-  /*     alphaValue := 255*/
-  /*     if y % 2 == 0 {*/
-  /*       alphaValue = 0*/
-  /*     }*/
-  /*     image.SetRGBA(x, y, color.RGBA{R: 0, G: 0, B: 0, A: uint8(alphaValue)})*/
-  /*   }*/
-  /* }*/
-  for x := 0; x <= width; x++ {
-    for y := 0; y <= height; y++ {
-      image.Set(x, y, template.At(x, y))
+  image := image.NewRGBA(image.Rect(0, 0, cypherWidth, cypherHeight))
+  for x := 0; x <= sourceWidth; x++ {
+    for y := 0; y <= sourceHeight; y++ {
+      setPixel(x, y, template.At(x, y), image)
     }
   }
 
   writeCyper(image)
+}
+
+func setPixel(x int, y int, color color.Color, cyperImage CypherImage) {
+  for cX := 2*x; cX <= 2*x+1; cX++ {
+    for cY := 2*y; cY <= 2*y+1; cY++ {
+      cyperImage.Set(cX, cY, color)
+    }
+  }
 }
 
 func writeCyper(image image.Image) {
