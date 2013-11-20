@@ -2,6 +2,8 @@ package main
 import (
   "image"
   "image/png"
+  _ "image/jpeg"
+  _ "image/gif"
   "image/color"
   "os"
   "bufio"
@@ -124,5 +126,6 @@ func readTemplate(path string) (image.Image, error) {
   }()
 
   reader := bufio.NewReader(file)
-  return png.Decode(reader)
+  img, _, err := image.Decode(reader)
+  return img, err
 }
