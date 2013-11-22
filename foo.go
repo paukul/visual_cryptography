@@ -8,6 +8,7 @@ import (
   "os"
   "bufio"
   "math/rand"
+  "time"
 )
 
 type CypherImage interface {
@@ -42,6 +43,7 @@ func NewCypherPixel() (CypherPixel) {
 }
 
 func main() {
+  rand.Seed( time.Now().UTC().UnixNano())
   var templatePath string
   if len(os.Args) == 1 {
     templatePath = "tux.png"
